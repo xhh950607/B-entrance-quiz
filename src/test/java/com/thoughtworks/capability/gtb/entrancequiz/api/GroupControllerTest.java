@@ -69,4 +69,11 @@ class GroupControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void should_409_when_rename_group_given_duplicate_name() throws Exception {
+        mockMvc.perform(patch("/groups/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"Term 2\"}"))
+                .andExpect(status().is(409));
+    }
 }

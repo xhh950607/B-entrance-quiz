@@ -2,6 +2,7 @@ package com.thoughtworks.capability.gtb.entrancequiz.api;
 
 import com.thoughtworks.capability.gtb.entrancequiz.domain.Group;
 import com.thoughtworks.capability.gtb.entrancequiz.domain.Trainee;
+import com.thoughtworks.capability.gtb.entrancequiz.exception.DuplicateGroupNameException;
 import com.thoughtworks.capability.gtb.entrancequiz.exception.NotFoundGroupException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,6 +52,11 @@ public class GroupController {
 
     @PatchMapping(path = "/groups/{id}")
     public void rename(@PathVariable int id, @RequestBody Group group) {
+        if(groupList.stream()
+                .anyMatch(g -> g.getName().equals(group.getName()))){
+            throw new DuplicateGroupNameException();
+        }
+
         groupList.stream()
                 .filter(g -> g.getId() == id)
                 .findFirst()
@@ -59,8 +65,13 @@ public class GroupController {
     }
 
     @ExceptionHandler(NotFoundGroupException.class)
-    public ResponseEntity handleException(Exception ex){
+    public ResponseEntity handleNotFoundGroupException(NotFoundGroupException ex){
         return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(DuplicateGroupNameException.class)
+    public ResponseEntity handleDuplicateGroupNameException(DuplicateGroupNameException ex){
+        return ResponseEntity.status(409).build();
     }
 
 }
