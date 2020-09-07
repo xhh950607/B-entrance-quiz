@@ -6,6 +6,8 @@ import com.thoughtworks.capability.gtb.entrancequiz.exception.DuplicateGroupName
 import com.thoughtworks.capability.gtb.entrancequiz.exception.NotFoundGroupException;
 import com.thoughtworks.capability.gtb.entrancequiz.repository.GroupRepository;
 import com.thoughtworks.capability.gtb.entrancequiz.repository.TraineeRepository;
+import com.thoughtworks.capability.gtb.entrancequiz.service.GroupService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,40 +19,25 @@ import java.util.stream.Stream;
 @CrossOrigin("*")
 public class GroupController {
 
+    private GroupService groupService;
+
+    public GroupController(GroupService groupService) {
+        this.groupService = groupService;
+    }
+
     @GetMapping(path = "/groups")
     public List<Group> getGroupList() {
-        return GroupRepository.getGroupList();
+        return groupService.getGroupList();
     }
 
     @GetMapping(path = "/groups/grouping")
     public void grouping() {
-        if(GroupRepository.getGroupList() == null){
-            GroupRepository.init();
-        }
-
-        List<Group> groupList = GroupRepository.getGroupList();
-        groupList.forEach(group -> group.setTraineeList(new ArrayList<>()));
-
-        Random random = new Random();
-        List<Trainee> traineeList = new ArrayList<>(TraineeRepository.getTraineeList());
-        int i = 0;
-        while (traineeList.size() > 0) {
-            int index = random.nextInt(traineeList.size());
-            Trainee trainee = traineeList.get(index);
-            groupList.get(i++ % groupList.size()).getTraineeList().add(trainee);
-            traineeList.remove(index);
-        }
+        groupService.grouping();
     }
 
     @PatchMapping(path = "/groups/{id}")
     public void rename(@PathVariable int id, @RequestBody Group group) {
-        if (GroupRepository.findOneByName(group.getName()).isPresent()) {
-            throw new DuplicateGroupNameException();
-        }
-
-        GroupRepository.findOneById(id)
-                .orElseThrow(NotFoundGroupException::new)
-                .setName(group.getName());
+        groupService.rename(id, group.getName());
     }
 
     @ExceptionHandler(NotFoundGroupException.class)
