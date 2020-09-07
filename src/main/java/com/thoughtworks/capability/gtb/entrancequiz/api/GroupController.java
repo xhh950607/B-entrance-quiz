@@ -3,6 +3,7 @@ package com.thoughtworks.capability.gtb.entrancequiz.api;
 import com.thoughtworks.capability.gtb.entrancequiz.domain.Group;
 import com.thoughtworks.capability.gtb.entrancequiz.domain.Trainee;
 import com.thoughtworks.capability.gtb.entrancequiz.exception.NotFoundGroupException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -55,6 +56,11 @@ public class GroupController {
                 .findFirst()
                 .orElseThrow(NotFoundGroupException::new)
                 .setName(group.getName());
+    }
+
+    @ExceptionHandler(NotFoundGroupException.class)
+    public ResponseEntity handleException(Exception ex){
+        return ResponseEntity.badRequest().build();
     }
 
 }

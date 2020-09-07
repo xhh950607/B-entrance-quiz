@@ -22,7 +22,7 @@ class GroupControllerTest {
     MockMvc mockMvc;
 
     @AfterEach
-    void clearDown(){
+    void clearDown() {
         GroupController.reset();
     }
 
@@ -60,4 +60,13 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$[0].name").value("T.O.P"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void should_bad_request_when_rename_group_given_invalid_id() throws Exception {
+        mockMvc.perform(patch("/groups/7")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"T.O.P\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
 }
