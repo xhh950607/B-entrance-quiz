@@ -29,4 +29,19 @@ public class GroupController {
         return groupList;
     }
 
+    @GetMapping(path = "/groups/grouping")
+    public void grouping() {
+        resetGroupList();
+
+        Random random = new Random();
+        List<Trainee> traineeList = new ArrayList<>(TraineeController.traineeList);
+        int i = 0;
+        while (traineeList.size() > 0) {
+            int index = random.nextInt(traineeList.size());
+            Trainee trainee = traineeList.get(index);
+            groupList.get(i++ % groupList.size()).getTraineeList().add(trainee);
+            traineeList.remove(index);
+        }
+    }
+
 }

@@ -25,4 +25,19 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$[0].name").value("Term 1"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void should_grouping() throws Exception {
+        mockMvc.perform(get("/groups/grouping"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/groups"))
+                .andExpect(jsonPath("$[0].traineeList.length()").value(6))
+                .andExpect(jsonPath("$[1].traineeList.length()").value(6))
+                .andExpect(jsonPath("$[2].traineeList.length()").value(6))
+                .andExpect(jsonPath("$[3].traineeList.length()").value(6))
+                .andExpect(jsonPath("$[4].traineeList.length()").value(6))
+                .andExpect(jsonPath("$[5].traineeList.length()").value(5))
+                .andExpect(status().isOk());
+    }
 }
