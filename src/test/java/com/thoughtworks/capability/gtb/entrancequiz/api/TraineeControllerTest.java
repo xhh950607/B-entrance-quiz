@@ -1,5 +1,6 @@
 package com.thoughtworks.capability.gtb.entrancequiz.api;
 
+import com.thoughtworks.capability.gtb.entrancequiz.repository.TraineeRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,9 +25,9 @@ class TraineeControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @AfterEach
-    void clearDown(){
-        TraineeController.resetTraineeList();
+    @BeforeEach
+    void setUp(){
+        TraineeRepository.init();
     }
 
     @Test

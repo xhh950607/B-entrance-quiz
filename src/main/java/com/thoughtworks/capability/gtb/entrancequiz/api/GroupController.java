@@ -4,6 +4,8 @@ import com.thoughtworks.capability.gtb.entrancequiz.domain.Group;
 import com.thoughtworks.capability.gtb.entrancequiz.domain.Trainee;
 import com.thoughtworks.capability.gtb.entrancequiz.exception.DuplicateGroupNameException;
 import com.thoughtworks.capability.gtb.entrancequiz.exception.NotFoundGroupException;
+import com.thoughtworks.capability.gtb.entrancequiz.repository.GroupRepository;
+import com.thoughtworks.capability.gtb.entrancequiz.repository.TraineeRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,35 +14,25 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
+@CrossOrigin("*")
 public class GroupController {
-
-    private static List<Group> groupList = initGroupList();
-
-    static void reset() {
-        groupList = initGroupList();
-    }
-
-    private static void resetGroupList() {
-        groupList.forEach(group -> group.setTraineeList(new ArrayList<>()));
-    }
-
-    private static List<Group> initGroupList() {
-        return Stream.of(1, 2, 3, 4, 5, 6)
-                .map(id -> new Group(id, "Term " + id, new ArrayList<>()))
-                .collect(Collectors.toList());
-    }
 
     @GetMapping(path = "/groups")
     public List<Group> getGroupList() {
-        return groupList;
+        return GroupRepository.getGroupList();
     }
 
     @GetMapping(path = "/groups/grouping")
     public void grouping() {
-        resetGroupList();
+        if(GroupRepository.getGroupList() == null){
+            GroupRepository.init();
+        }
+
+        List<Group> groupList = GroupRepository.getGroupList();
+        groupList.forEach(group -> group.setTraineeList(new ArrayList<>()));
 
         Random random = new Random();
-        List<Trainee> traineeList = new ArrayList<>(TraineeController.traineeList);
+        List<Trainee> traineeList = new ArrayList<>(TraineeRepository.getTraineeList());
         int i = 0;
         while (traineeList.size() > 0) {
             int index = random.nextInt(traineeList.size());
@@ -52,25 +44,22 @@ public class GroupController {
 
     @PatchMapping(path = "/groups/{id}")
     public void rename(@PathVariable int id, @RequestBody Group group) {
-        if(groupList.stream()
-                .anyMatch(g -> g.getName().equals(group.getName()))){
+        if (GroupRepository.findOneByName(group.getName()).isPresent()) {
             throw new DuplicateGroupNameException();
         }
 
-        groupList.stream()
-                .filter(g -> g.getId() == id)
-                .findFirst()
+        GroupRepository.findOneById(id)
                 .orElseThrow(NotFoundGroupException::new)
                 .setName(group.getName());
     }
 
     @ExceptionHandler(NotFoundGroupException.class)
-    public ResponseEntity handleNotFoundGroupException(NotFoundGroupException ex){
+    public ResponseEntity handleNotFoundGroupException(NotFoundGroupException ex) {
         return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(DuplicateGroupNameException.class)
-    public ResponseEntity handleDuplicateGroupNameException(DuplicateGroupNameException ex){
+    public ResponseEntity handleDuplicateGroupNameException(DuplicateGroupNameException ex) {
         return ResponseEntity.status(409).build();
     }
 

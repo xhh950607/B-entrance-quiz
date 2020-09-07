@@ -1,6 +1,8 @@
 package com.thoughtworks.capability.gtb.entrancequiz.api;
 
+import com.thoughtworks.capability.gtb.entrancequiz.repository.GroupRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,9 +23,9 @@ class GroupControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @AfterEach
-    void clearDown() {
-        GroupController.reset();
+    @BeforeEach
+    void setUp() {
+        GroupRepository.init();
     }
 
     @Test
