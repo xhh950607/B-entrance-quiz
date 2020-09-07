@@ -1,5 +1,6 @@
 package com.thoughtworks.capability.gtb.entrancequiz.api;
 
+import com.thoughtworks.capability.gtb.entrancequiz.domain.Group;
 import com.thoughtworks.capability.gtb.entrancequiz.domain.Trainee;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import java.util.List;
 @CrossOrigin("*")
 public class TraineeController {
 
-    private static List<Trainee> traineeList;
+    static List<Trainee> traineeList;
 
     static void resetTraineeList(){
         List<String> nameList = Arrays.asList("沈乐棋", "徐慧慧", "陈思聪", "王江林", "王登宇", "杨思雨",
@@ -41,4 +42,5 @@ public class TraineeController {
         trainee.setId(traineeList.size()+1);
         traineeList.add(trainee);
     }
+
 }
